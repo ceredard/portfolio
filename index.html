@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Christopher Redard — Engineering Portfolio</title>
+  <meta name="description" content="Mechanical and hardware engineering projects, CAD models, and custom 3D printing.">
+  <link rel="stylesheet" href="/css/fonts.css">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script type="importmap">
+  { "imports": {
+      "three": "/js/vendor/three/three.module.js",
+      "three/addons/": "/js/vendor/three/addons/"
+  } }
+  </script>
+</head>
+<body>
+  <header class="site-head">
+    <div class="wrap">
+      <a class="brand" href="/"><b data-site-name>Christopher Redard</b><span data-site-role>Mechanical &amp; hardware</span></a>
+      <nav class="nav" aria-label="Main">
+        <a href="/#work">Work</a>
+        <a href="/#about">About</a>
+        <a href="/shop.html" data-nav="shop">Shop</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <div class="hero-copy">
+          <span class="label" id="hero-eyebrow">Engineering portfolio</span>
+          <h1 id="hero-title">Things I've <em>designed</em>, built and broken</h1>
+          <p class="lede" id="hero-intro"></p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#work">See the work</a>
+            <a class="btn" href="/shop.html" data-nav="shop">Order a print</a>
+          </div>
+          <div class="hero-stats" id="hero-stats"></div>
+        </div>
+        <div class="hero-model">
+          <div id="hero-viewer" class="viewer tall"></div>
+          <a class="label" id="hero-caption" href="#" style="text-decoration:none"></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="work">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <span class="label">Project index</span>
+            <h2>Work</h2>
+          </div>
+          <div class="filters" id="filters" role="group" aria-label="Filter projects"></div>
+        </div>
+        <div class="grid" id="project-grid"></div>
+      </div>
+    </section>
+
+    <section class="section" id="about" style="border-top:1px solid var(--line)">
+      <div class="wrap about">
+        <img id="about-photo" alt="" hidden>
+        <div class="about-body">
+          <span class="label">About</span>
+          <h2 id="about-title">About me</h2>
+          <div class="prose" id="about-body"></div>
+          <div class="skills" id="skills"></div>
+          <div class="links" id="links"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-foot"><div class="wrap" data-foot></div></footer>
+
+  <script type="module">
+    import { getJSON, initChrome, esc } from "/js/common.js";
+    import { mountViewer } from "/js/viewer.js";
+    import { marked } from "/js/vendor/marked.esm.js";
+
+    const site = await initChrome();
+    const { projects = [] } = await getJSON("/content/projects.json");
+    const visible = projects.filter((p) => !p.hidden)
+      .sort((a, b) => (b.featured - a.featured) || String(b.date).localeCompare(String(a.date)));
+
+    // Hero
+    if (site.hero_title) document.getElementById("hero-title").innerHTML = esc(site.hero_title).replace(/\*(.+?)\*/g, "<em>$1</em>");
+    document.getElementById("hero-intro").textContent = site.intro || "";
+    const cadCount = visible.filter((p) => p.models?.length).length;
+    const years = visible.map((p) => parseInt(p.date)).filter(Boolean);
+    const lo = Math.min(...years), hi = Math.max(...years);
+    const span = !years.length ? "—" : lo === hi ? String(lo) : `${lo}–${hi}`;
+    document.getElementById("hero-stats").innerHTML = [
+      [visible.length, "Projects"], [cadCount, "With 3D models"], [span, lo === hi ? "Year" : "Years"],
+    ].map(([n, l]) => `<div><b>${esc(n)}</b><span class="label">${l}</span></div>`).join("");
+
+    const heroProj = visible.find((p) => p.slug === site.hero_project) || visible.find((p) => p.models?.length);
+    if (heroProj?.models?.length) {
+      const m = heroProj.models[0];
+      mountViewer(document.getElementById("hero-viewer"), { src: m.file, units: m.units, up: m.up, color: m.color });
+      const cap = document.getElementById("hero-caption");
+      cap.textContent = `${heroProj.code ? heroProj.code + " · " : ""}${heroProj.title} — open project →`;
+      cap.href = `/project.html?p=${encodeURIComponent(heroProj.slug)}`;
+    } else {
+      document.getElementById("hero-viewer").parentElement.hidden = true;
+    }
+
+    // Project grid + filters
+    const cats = ["All", ...new Set(visible.map((p) => p.category).filter(Boolean))];
+    const filters = document.getElementById("filters");
+    const grid = document.getElementById("project-grid");
+    let current = "All";
+    function renderGrid() {
+      const list = visible.filter((p) => current === "All" || p.category === current);
+      grid.innerHTML = list.length ? list.map((p) => `
+        <a class="card" href="/project.html?p=${encodeURIComponent(p.slug)}">
+          <div class="card-media">
+            ${p.cover ? `<img src="${esc(p.cover)}" alt="" loading="lazy">` : ""}
+            <div class="card-badges">
+              ${p.models?.length ? `<span class="badge cad">3D model</span>` : ""}
+              ${p.status && p.status !== "Complete" ? `<span class="badge">${esc(p.status)}</span>` : ""}
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-meta"><span class="label">${esc(p.code || "")}</span><span class="label">${esc(p.date || "")}</span></div>
+            <h3>${esc(p.title)}</h3>
+            <p>${esc(p.summary || "")}</p>
+            <div class="tags">${(p.tags || []).slice(0, 4).map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div>
+          </div>
+        </a>`).join("") : `<div class="empty">No projects yet. Add one from the admin panel.</div>`;
+    }
+    filters.innerHTML = cats.map((c) => `<button type="button" class="chip" aria-pressed="${c === current}">${esc(c)}</button>`).join("");
+    filters.addEventListener("click", (e) => {
+      const b = e.target.closest(".chip"); if (!b) return;
+      current = b.textContent;
+      filters.querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", x === b));
+      renderGrid();
+    });
+    if (cats.length <= 2) filters.hidden = true;
+    renderGrid();
+
+    // About
+    if (site.photo) { const img = document.getElementById("about-photo"); img.src = site.photo; img.alt = site.name; img.hidden = false; }
+    document.getElementById("about-body").innerHTML = marked.parse(site.about || "");
+    document.getElementById("skills").innerHTML = (site.skills || []).map((s) =>
+      `<div><span class="label">${esc(s.group)}</span><span>${esc(s.items)}</span></div>`).join("");
+    document.getElementById("links").innerHTML = (site.links || []).map((l) =>
+      `<a class="btn small" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("");
+  </script>
+</body>
+</html>

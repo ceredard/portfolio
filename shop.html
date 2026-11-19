@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Print Shop — Christopher Redard</title>
+  <meta name="description" content="Order 3D printed parts in your choice of color, or request a custom print.">
+  <link rel="stylesheet" href="/css/fonts.css">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script type="importmap">
+  { "imports": {
+      "three": "/js/vendor/three/three.module.js",
+      "three/addons/": "/js/vendor/three/addons/"
+  } }
+  </script>
+</head>
+<body>
+  <header class="site-head">
+    <div class="wrap">
+      <a class="brand" href="/"><b data-site-name>Christopher Redard</b><span data-site-role>Mechanical &amp; hardware</span></a>
+      <nav class="nav" aria-label="Main">
+        <a href="/#work">Work</a>
+        <a href="/#about">About</a>
+        <a href="/shop.html" aria-current="page">Shop</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="section" style="padding-bottom:24px">
+      <div class="wrap" style="display:grid;gap:16px">
+        <span class="label" id="shop-eyebrow">Print shop</span>
+        <h1 id="shop-title">Printed to order</h1>
+        <p class="lede" id="shop-intro"></p>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:8px">
+      <div class="wrap">
+        <div class="shop-grid" id="shop-grid"></div>
+      </div>
+    </section>
+
+    <section class="section" id="order" style="border-top:1px solid var(--line)">
+      <div class="wrap">
+        <div class="section-head"><div><span class="label">Request form</span><h2>Place an order</h2></div></div>
+        <p class="muted" style="max-width:62ch;margin-bottom:28px" id="order-note">No payment is taken here. I'll review your order, confirm the details, and send an invoice before printing.</p>
+
+        <div class="order-wrap">
+          <!-- Netlify reads this form at deploy time. Keep name="order" and the field names stable. -->
+          <form class="form" id="order-form" name="order" method="POST" data-netlify="true" netlify-honeypot="bot-field" enctype="multipart/form-data" novalidate>
+            <input type="hidden" name="form-name" value="order">
+            <input type="hidden" name="reference" id="f-reference">
+            <input type="hidden" name="unit-price" id="f-unit">
+            <input type="hidden" name="estimated-total" id="f-total">
+            <p hidden><label>Leave this empty: <input name="bot-field"></label></p>
+
+            <fieldset>
+              <legend>What you're ordering</legend>
+              <div class="seg" role="radiogroup" aria-label="Order type">
+                <label><input type="radio" name="order-type" value="Shop item" id="t-shop" checked><span>Shop item</span></label>
+                <label id="t-custom-wrap"><input type="radio" name="order-type" value="Custom print" id="t-custom"><span>Custom print</span></label>
+              </div>
+
+              <div id="shop-fields" style="display:grid;gap:14px">
+                <div class="row">
+                  <div class="field"><label for="f-item">Item <span class="req">*</span></label><select id="f-item" name="item"></select></div>
+                  <div class="field"><label for="f-color">Color <span class="req">*</span></label><select id="f-color" name="color"></select></div>
+                </div>
+                <div class="swatches" id="f-swatches" role="radiogroup" aria-label="Color"></div>
+              </div>
+
+              <div id="custom-fields" style="display:grid;gap:14px" hidden>
+                <div class="field">
+                  <label for="f-desc">Describe what you need <span class="req">*</span></label>
+                  <textarea id="f-desc" name="custom-description" placeholder="What is it, what does it attach to, rough size, how strong or heat resistant does it need to be?"></textarea>
+                </div>
+                <div class="row">
+                  <div class="field"><label for="f-mat">Material</label><select id="f-mat" name="custom-material"></select></div>
+                  <div class="field"><label for="f-ccolor">Color</label><input type="text" id="f-ccolor" name="custom-color" placeholder="e.g. matte black"></div>
+                </div>
+                <div class="field">
+                  <label for="f-file">Model or sketch (optional)</label>
+                  <input type="file" id="f-file" name="attachment" accept=".stl,.3mf,.step,.stp,.obj,.pdf,.png,.jpg,.jpeg">
+                  <span class="hint">STL, 3MF, STEP, OBJ, PDF or image. Max 8 MB. Larger files: add a download link in the notes.</span>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="field"><label for="f-qty">Quantity <span class="req">*</span></label><input type="number" id="f-qty" name="quantity" min="1" max="500" value="1" inputmode="numeric"></div>
+                <div class="field"><label for="f-needby">Needed by (optional)</label><input type="text" id="f-needby" name="needed-by" placeholder="e.g. Nov 15"></div>
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>Your details</legend>
+              <div class="row">
+                <div class="field"><label for="f-name">Full name <span class="req">*</span></label><input type="text" id="f-name" name="name" autocomplete="name"></div>
+                <div class="field"><label for="f-email">Email <span class="req">*</span></label><input type="email" id="f-email" name="email" autocomplete="email"></div>
+              </div>
+              <div class="field"><label for="f-phone">Phone (optional)</label><input type="tel" id="f-phone" name="phone" autocomplete="tel"></div>
+            </fieldset>
+
+            <fieldset>
+              <legend>Delivery</legend>
+              <div class="seg" role="radiogroup" aria-label="Delivery method">
+                <label><input type="radio" name="delivery" value="Ship" id="d-ship" checked><span>Ship to me</span></label>
+                <label id="d-pickup-wrap"><input type="radio" name="delivery" value="Local pickup" id="d-pickup"><span>Local pickup</span></label>
+              </div>
+              <div id="addr" style="display:grid;gap:14px">
+                <div class="field"><label for="f-a1">Street address <span class="req">*</span></label><input type="text" id="f-a1" name="address-line-1" autocomplete="address-line1"></div>
+                <div class="field"><label for="f-a2">Apt, suite, etc.</label><input type="text" id="f-a2" name="address-line-2" autocomplete="address-line2"></div>
+                <div class="row">
+                  <div class="field"><label for="f-city">City <span class="req">*</span></label><input type="text" id="f-city" name="city" autocomplete="address-level2"></div>
+                  <div class="field"><label for="f-state">State <span class="req">*</span></label><input type="text" id="f-state" name="state" autocomplete="address-level1"></div>
+                  <div class="field"><label for="f-zip">ZIP <span class="req">*</span></label><input type="text" id="f-zip" name="zip" autocomplete="postal-code" inputmode="numeric"></div>
+                </div>
+              </div>
+              <p class="muted" id="pickup-note" hidden></p>
+            </fieldset>
+
+            <div class="field"><label for="f-notes">Anything else?</label><textarea id="f-notes" name="notes"></textarea></div>
+
+            <div id="form-msg" role="status" aria-live="polite"></div>
+            <div><button class="btn primary" type="submit" id="submit">Submit order request</button></div>
+          </form>
+
+          <aside class="summary" aria-label="Order summary">
+            <span class="label">Summary</span>
+            <dl id="sum"></dl>
+            <div class="total"><span class="label">Estimate</span><b id="sum-total">—</b></div>
+            <p class="muted" style="font-size:.85rem" id="sum-note"></p>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-foot"><div class="wrap" data-foot></div></footer>
+
+  <script type="module" src="/js/shop.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "Christopher Redard",
+  "role": "Mechanical & hardware engineer",
+  "email": "ceredard@gmail.com",
+  "hero_title": "Things I've *designed*, built and tested",
+  "intro": "Mechanical design, mechanisms, and hardware prototypes, from first sketch in CAD to a part on the bench. Spin the models, read the build notes, or order a print.",
+  "hero_project": "cam-latch",
+  "photo": "/assets/uploads/profile.svg",
+  "about": "I'm an engineer who likes to work with my hands. Most of my projects start as a problem at the bench, turn into a model in OnShape or SolidWorks, and end up printed, wired, or machined.\n\nThis site collects the projects I've worked on over the years. Some are finished, some are ongoing, and a few taught me more by failing.",
+  "skills": [
+    { "group": "CAD", "items": "OnShape, SolidWorks" },
+    { "group": "Analysis", "items": "Mechanism kinematics, force and torque analysis, FEA" },
+    { "group": "Hardware", "items": "Raspberry Pi, Arduino, sensors, pneumatics, connectors" },
+    { "group": "Fabrication", "items": "FDM 3D printing (Bambu Lab X2D), fastening and tapping" }
+  ],
+  "links": [
+    { "label": "Email me", "url": "mailto:ceredard@gmail.com" },
+    { "label": "LinkedIn", "url": "https://www.linkedin.com/" }
+  ],
+  "shop_enabled": true
+}

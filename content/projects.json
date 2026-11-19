@@ -1,0 +1,97 @@
+{
+  "projects": [
+    {
+      "title": "Over-center cam latch",
+      "slug": "cam-latch",
+      "code": "PRJ-001",
+      "date": "2026",
+      "category": "Mechanisms",
+      "status": "In progress",
+      "featured": true,
+      "summary": "A two-cam over-center latch sized from pressure-angle, torque, and bearing side-load analysis.",
+      "cover": "/assets/uploads/cam-latch.svg",
+      "tools": ["OnShape", "SolidWorks Motion", "FEA"],
+      "tags": ["Cam design", "Mechanism", "Kinematics"],
+      "body": "## The problem\n\nDraft: describe what the latch needs to hold, why an over-center design, and the constraints you were working inside.\n\n## Approach\n\n- Compared cycloidal and linear motion laws for the cam rise to keep pressure angle and peak torque down.\n- Checked needle bearing side loads on the follower.\n- Split the load across two cams and checked how evenly they share it.\n\n## Validation\n\nPlanned: SolidWorks Motion study for the force profile through the stroke, then FEA on the cam plate and pivot.\n\n## What I learned\n\nDraft: add results, photos of the prototype, and what you'd change.",
+      "specs": [
+        { "label": "Motion law", "value": "Cycloidal rise, 180°" },
+        { "label": "Base circle", "value": "Ø30 mm" },
+        { "label": "Lift", "value": "12 mm" },
+        { "label": "Plate thickness", "value": "8 mm" }
+      ],
+      "models": [
+        { "label": "Cam plate", "file": "/assets/models/cam-plate.stl", "units": "mm", "up": "z", "color": "#c0c8d2", "note": "Sample cam plate with keyed Ø10 bore. Replace with your exported STL." }
+      ],
+      "gallery": [],
+      "links": []
+    },
+    {
+      "title": "Sound-reactive Raspberry Pi sensor",
+      "slug": "sound-detector",
+      "code": "PRJ-002",
+      "date": "2026",
+      "category": "Electronics",
+      "status": "In progress",
+      "featured": false,
+      "summary": "A SparkFun Sound Detector wired to a Raspberry Pi, bench-tested on an Arduino first, in a printed enclosure.",
+      "cover": "/assets/uploads/sound-detector.svg",
+      "tools": ["Raspberry Pi", "Arduino", "OnShape", "Bambu Lab X2D"],
+      "tags": ["Sensors", "Raspberry Pi", "Enclosure"],
+      "body": "## Overview\n\nDraft: what the sensor is for and what it triggers.\n\n## Build notes\n\n- Board is a SEN-12642 Sound Detector (likely a clone, based on inspection).\n- Wrote an Arduino test sketch for the GATE output to isolate the sensor before wiring it to the Pi.\n- Pulled SparkFun's CAD model of the board to design the enclosure around it.\n\n## Enclosure\n\nThe sample model below is a placeholder shell with a mic port, USB cutout, and four M2.5 standoffs. Swap in your real part.",
+      "specs": [
+        { "label": "Sensor", "value": "SparkFun SEN-12642" },
+        { "label": "Controller", "value": "Raspberry Pi" },
+        { "label": "Enclosure", "value": "95 × 66 × 30 mm" }
+      ],
+      "models": [
+        { "label": "Enclosure base", "file": "/assets/models/pi-enclosure.glb", "units": "mm", "up": "z", "color": "#9aa3ad", "note": "" }
+      ],
+      "gallery": [],
+      "links": [],
+      "shop_item": "pi-enclosure"
+    },
+    {
+      "title": "Network-wide ad blocking with Pi-hole",
+      "slug": "pihole",
+      "code": "PRJ-003",
+      "date": "2026",
+      "category": "Software",
+      "status": "Complete",
+      "featured": false,
+      "summary": "A Raspberry Pi 3 running Pi-hole as the DNS server for the whole home network.",
+      "cover": "/assets/uploads/pihole.svg",
+      "tools": ["Raspberry Pi 3", "Pi-hole", "Linux"],
+      "tags": ["Networking", "Raspberry Pi", "DNS"],
+      "body": "## Setup\n\n- Raspberry Pi 3 on wired Ethernet, Wi-Fi disabled.\n- Upstream DNS: Quad9 (filtered, DNSSEC).\n- Blocklists: StevenBlack and OISD Big, about 350k domains, plus two regex filters.\n\n## Router quirks\n\nDraft: describe working around the router's DHCP/DNS behavior and what you'd do differently.",
+      "specs": [
+        { "label": "Hardware", "value": "Raspberry Pi 3" },
+        { "label": "Blocked domains", "value": "~350,000" },
+        { "label": "Upstream", "value": "Quad9 + DNSSEC" }
+      ],
+      "models": [],
+      "gallery": [],
+      "links": []
+    },
+    {
+      "title": "Engineering reference app",
+      "slug": "reference-app",
+      "code": "PRJ-004",
+      "date": "2026",
+      "category": "Software",
+      "status": "Complete",
+      "featured": false,
+      "summary": "An offline HTML tool with screw, tap and drill tables, a McMaster-Carr finder, and a hardware inventory.",
+      "cover": "/assets/uploads/reference-app.svg",
+      "tools": ["HTML", "JavaScript"],
+      "tags": ["Tooling", "Fasteners", "Web app"],
+      "body": "## Why\n\nDraft: the lookup you kept repeating at the bench.\n\n## Features\n\n- Imperial and metric screw, tap and drill bit tables with live search\n- McMaster-Carr part finder\n- Hardware inventory tracker with CSV export, stored locally in the browser",
+      "specs": [
+        { "label": "Runs", "value": "Offline, single HTML file" },
+        { "label": "Storage", "value": "Browser localStorage" }
+      ],
+      "models": [],
+      "gallery": [],
+      "links": []
+    }
+  ]
+}

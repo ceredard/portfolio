@@ -1,0 +1,176 @@
+# ---------------------------------------------------------------------------
+# Admin panel settings (Decap CMS).
+# 1) Change `repo` below to YOUR-GITHUB-USERNAME/YOUR-REPO-NAME.
+# 2) Log in at https://your-site.netlify.app/admin/ with GitHub.
+# Every "Publish" commits to GitHub and Netlify redeploys in ~30 seconds.
+# ---------------------------------------------------------------------------
+backend:
+  name: github
+  repo: ceredard/portfolio
+  branch: main
+  commit_messages:
+    update: "Update {{collection}} “{{slug}}”"
+
+# Lets you test the editor on your own computer with `npx decap-server`.
+local_backend: true
+
+site_url: https://christopher-redard.netlify.app
+media_folder: assets/uploads
+public_folder: /assets/uploads
+
+collections:
+  # ------------------------------------------------------------ PROJECTS
+  - name: projects
+    label: Projects
+    files:
+      - name: all
+        label: All projects
+        file: content/projects.json
+        fields:
+          - name: projects
+            label: Projects
+            label_singular: project
+            widget: list
+            collapsed: true
+            summary: "{{fields.code}} · {{fields.title}}"
+            add_to_top: true
+            fields:
+              - { name: title, label: Title, widget: string }
+              - { name: slug, label: "URL name", widget: string, hint: "Lowercase with dashes, e.g. cam-latch. Must be unique. Changing it breaks old links." }
+              - { name: code, label: "Project number", widget: string, required: false, hint: "Shown like a drawing number, e.g. PRJ-005" }
+              - { name: date, label: "Year or date", widget: string, hint: "e.g. 2019 or 2024-06. Newest shows first." }
+              - { name: category, label: Category, widget: string, hint: "Used for the filter buttons, e.g. Mechanisms, Electronics, Software, 3D printing" }
+              - { name: status, label: Status, widget: select, options: ["Complete", "In progress", "Concept", "Retired"], default: "Complete" }
+              - { name: featured, label: "Pin to top", widget: boolean, default: false }
+              - { name: hidden, label: "Hide from site", widget: boolean, default: false }
+              - { name: summary, label: "One-line summary", widget: text }
+              - { name: cover, label: "Cover photo", widget: image, required: false }
+              - { name: tools, label: "Tools / software", widget: list, required: false, hint: "Comma separated" }
+              - { name: tags, label: Tags, widget: list, required: false }
+              - name: body
+                label: "Write-up"
+                widget: markdown
+                required: false
+                hint: "Use headings like The problem / Approach / Results. You can drop images in here too."
+              - name: gallery
+                label: "Photo gallery"
+                widget: list
+                required: false
+                summary: "{{fields.caption}}"
+                fields:
+                  - { name: image, label: Photo, widget: image }
+                  - { name: caption, label: Caption, widget: string, required: false }
+              - name: models
+                label: "3D models"
+                label_singular: model
+                widget: list
+                required: false
+                summary: "{{fields.label}}"
+                hint: "Upload STL, 3MF, OBJ, GLB or GLTF. Keep files under ~20 MB."
+                fields:
+                  - { name: label, label: "Tab label", widget: string, default: "Model" }
+                  - { name: file, label: "Model file", widget: file, media_library: { config: { multiple: false } } }
+                  - { name: units, label: Units, widget: select, options: ["mm", "in", "m"], default: "mm" }
+                  - { name: up, label: "Up axis", widget: select, options: ["z", "y"], default: "z", hint: "STL/3MF from OnShape or SolidWorks: z. GLB/GLTF: usually y. Flip it if the model shows up on its side." }
+                  - { name: color, label: "Display color", widget: color, default: "#c0c8d2", required: false, hint: "Ignored for GLB files that carry their own colors" }
+                  - { name: note, label: Note, widget: string, required: false }
+              - name: specs
+                label: Specifications
+                widget: list
+                required: false
+                summary: "{{fields.label}}: {{fields.value}}"
+                fields:
+                  - { name: label, label: Label, widget: string }
+                  - { name: value, label: Value, widget: string }
+              - name: links
+                label: Links
+                widget: list
+                required: false
+                fields:
+                  - { name: label, label: Label, widget: string }
+                  - { name: url, label: URL, widget: string }
+              - { name: shop_item, label: "Linked shop item ID", widget: string, required: false, hint: "Adds an Order button that jumps to this shop item, e.g. pi-enclosure" }
+
+  # ------------------------------------------------------------ SHOP
+  - name: shop
+    label: Print shop
+    files:
+      - name: shop
+        label: Shop items & settings
+        file: content/shop.json
+        fields:
+          - name: items
+            label: Items for sale
+            label_singular: item
+            widget: list
+            collapsed: true
+            summary: "{{fields.name}} — ${{fields.price}}"
+            fields:
+              - { name: id, label: "Item ID", widget: string, hint: "Lowercase with dashes, unique, e.g. cable-clip" }
+              - { name: name, label: Name, widget: string }
+              - { name: available, label: "Show in shop", widget: boolean, default: true }
+              - { name: price, label: "Price (USD)", widget: number, value_type: float, min: 0, required: false, hint: "Leave blank to show 'Quote'" }
+              - { name: description, label: Description, widget: text }
+              - { name: image, label: Photo, widget: image, required: false }
+              - { name: material, label: Material, widget: string, required: false }
+              - { name: size, label: Size, widget: string, required: false }
+              - { name: lead_time, label: "Lead time", widget: string, required: false, hint: "e.g. 3–5 days" }
+              - name: colors
+                label: "Color options"
+                label_singular: color
+                widget: list
+                summary: "{{fields.name}}"
+                fields:
+                  - { name: name, label: "Color name", widget: string }
+                  - { name: hex, label: Swatch, widget: color }
+              - name: model
+                label: "3D model (optional)"
+                widget: object
+                required: false
+                collapsed: true
+                fields:
+                  - { name: file, label: "Model file", widget: file, required: false }
+                  - { name: units, label: Units, widget: select, options: ["mm", "in", "m"], default: "mm" }
+                  - { name: up, label: "Up axis", widget: select, options: ["z", "y"], default: "z" }
+          - { name: title, label: "Page heading", widget: string }
+          - { name: intro, label: "Intro text", widget: text }
+          - { name: order_note, label: "Note above the order form", widget: text }
+          - { name: currency, label: "Currency code", widget: string, default: "USD" }
+          - { name: shipping_flat, label: "Flat shipping price", widget: number, value_type: float, min: 0, hint: "Set to 0 to show 'Ship · quoted'" }
+          - { name: pickup_enabled, label: "Offer local pickup", widget: boolean }
+          - { name: pickup_note, label: "Pickup note", widget: string, required: false }
+          - { name: response_time, label: "Reply time shown to customers", widget: string }
+          - { name: summary_note, label: "Note under the estimate", widget: string, required: false }
+          - { name: custom_enabled, label: "Accept custom print requests", widget: boolean }
+          - { name: materials, label: "Materials for custom prints", widget: list }
+
+  # ------------------------------------------------------------ SITE
+  - name: settings
+    label: Site settings
+    files:
+      - name: site
+        label: "Name, intro & about"
+        file: content/site.json
+        fields:
+          - { name: name, label: "Your name", widget: string }
+          - { name: role, label: "Title under your name", widget: string }
+          - { name: email, label: "Contact email", widget: string }
+          - { name: hero_title, label: "Headline", widget: string, hint: "Wrap a word in *asterisks* to color it" }
+          - { name: intro, label: "Intro paragraph", widget: text }
+          - { name: hero_project, label: "Project whose model spins on the home page (URL name)", widget: string, required: false }
+          - { name: photo, label: "Your photo", widget: image, required: false }
+          - { name: about, label: "About me", widget: markdown }
+          - name: skills
+            label: Skills
+            widget: list
+            summary: "{{fields.group}}"
+            fields:
+              - { name: group, label: Group, widget: string }
+              - { name: items, label: Items, widget: string }
+          - name: links
+            label: "Links (LinkedIn, GitHub, résumé…)"
+            widget: list
+            fields:
+              - { name: label, label: Label, widget: string }
+              - { name: url, label: URL, widget: string }
+          - { name: shop_enabled, label: "Show the shop", widget: boolean, default: true }

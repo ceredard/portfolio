@@ -1,0 +1,12 @@
+[build]
+  publish = "."
+
+# Serve 3D model files with sensible types and let browsers cache them.
+[[headers]]
+  for = "/assets/models/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+[[headers]]
+  for = "/content/*"
+  [headers.values]
+    Cache-Control = "no-cache"

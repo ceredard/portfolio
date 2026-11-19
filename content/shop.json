@@ -1,0 +1,50 @@
+{
+  "title": "Printed to order",
+  "intro": "Parts I've designed and printed on my own Bambu Lab X2D. Pick a color and I'll print it for you, or send me your own model or idea for a custom print.",
+  "order_note": "No payment is taken here. I'll review your order, confirm the details, and send an invoice before printing.",
+  "currency": "USD",
+  "shipping_flat": 5,
+  "pickup_enabled": true,
+  "pickup_note": "I'll email you to arrange a pickup time.",
+  "response_time": "2 business days",
+  "summary_note": "Estimate only. Final price confirmed by email before you pay.",
+  "custom_enabled": true,
+  "materials": ["PLA", "PETG", "ASA", "TPU (flexible)"],
+  "items": [
+    {
+      "id": "cable-clip",
+      "name": "Desk cable clips, 10-pack",
+      "description": "Snap-in clips for cables up to 9 mm. Stick them under a desk with foam tape or screw them down.",
+      "price": 8,
+      "image": "/assets/uploads/shop-cable-clip.svg",
+      "material": "PETG",
+      "size": "22 × 15 × 10 mm",
+      "lead_time": "3–5 days",
+      "available": true,
+      "colors": [
+        { "name": "Matte black", "hex": "#1f1f22" },
+        { "name": "Cool white", "hex": "#e8e9eb" },
+        { "name": "Signal orange", "hex": "#e8742c" },
+        { "name": "Steel gray", "hex": "#7d848c" }
+      ],
+      "model": { "file": "/assets/models/cable-clip.stl", "units": "mm", "up": "z" }
+    },
+    {
+      "id": "pi-enclosure",
+      "name": "Raspberry Pi sensor enclosure",
+      "description": "Vented base with M2.5 standoffs, a mic port and a USB cutout. Fits a Pi-sized board.",
+      "price": 18,
+      "image": "/assets/uploads/shop-pi-case.svg",
+      "material": "PLA",
+      "size": "95 × 66 × 30 mm",
+      "lead_time": "5–7 days",
+      "available": true,
+      "colors": [
+        { "name": "Charcoal", "hex": "#34373c" },
+        { "name": "Bone white", "hex": "#e6e0d2" },
+        { "name": "Deep blue", "hex": "#2b4f7a" }
+      ],
+      "model": { "file": "/assets/models/pi-enclosure.glb", "units": "mm", "up": "z" }
+    }
+  ]
+}

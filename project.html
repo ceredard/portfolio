@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Project — Christopher Redard</title>
+  <link rel="stylesheet" href="/css/fonts.css">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script type="importmap">
+  { "imports": {
+      "three": "/js/vendor/three/three.module.js",
+      "three/addons/": "/js/vendor/three/addons/"
+  } }
+  </script>
+</head>
+<body>
+  <header class="site-head">
+    <div class="wrap">
+      <a class="brand" href="/"><b data-site-name>Christopher Redard</b><span data-site-role>Mechanical &amp; hardware</span></a>
+      <nav class="nav" aria-label="Main">
+        <a href="/#work" aria-current="page">Work</a>
+        <a href="/#about">About</a>
+        <a href="/shop.html" data-nav="shop">Shop</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap" id="main">
+    <div class="detail-head">
+      <a class="back" href="/#work">← All projects</a>
+      <p class="muted">Loading…</p>
+    </div>
+  </main>
+
+  <footer class="site-foot"><div class="wrap" data-foot></div></footer>
+
+  <script type="module">
+    import { getJSON, initChrome, esc } from "/js/common.js";
+    import { mountViewer } from "/js/viewer.js";
+    import { marked } from "/js/vendor/marked.esm.js";
+
+    const site = await initChrome();
+    const slug = new URLSearchParams(location.search).get("p");
+    const { projects = [] } = await getJSON("/content/projects.json");
+    const p = projects.find((x) => x.slug === slug);
+    const main = document.getElementById("main");
+
+    if (!p) {
+      main.innerHTML = `<div class="detail-head"><a class="back" href="/#work">← All projects</a><h1>Not found</h1><p class="muted">That project doesn't exist or was renamed.</p></div>`;
+    } else {
+      document.title = `${p.title} — ${site.name}`;
+      const block = [
+        ["Project no.", p.code], ["Date", p.date], ["Category", p.category],
+        ["Status", p.status], ["Tools", (p.tools || []).join(", ")],
+      ].filter(([, v]) => v);
+
+      const images = [...(p.cover ? [{ image: p.cover, caption: "" }] : []), ...(p.gallery || [])];
+      const models = p.models || [];
+
+      main.innerHTML = `
+        <div class="detail-head">
+          <a class="back" href="/#work">← All projects</a>
+          <h1>${esc(p.title)}</h1>
+          <p class="lede">${esc(p.summary || "")}</p>
+          <div class="titleblock">${block.map(([k, v]) => `<div><span class="label">${k}</span><b>${esc(v)}</b></div>`).join("")}</div>
+        </div>
+        <div class="detail-grid" style="padding-bottom:24px">
+          <div style="display:grid;gap:40px;min-width:0">
+            ${images.length ? `
+              <section class="gallery" aria-label="Photos">
+                <figure class="gallery-main" style="margin:0"><img id="g-img" alt=""><figcaption id="g-cap" hidden></figcaption></figure>
+                ${images.length > 1 ? `<div class="thumbs" id="thumbs">${images.map((g, i) =>
+                  `<button type="button" data-i="${i}" aria-label="Photo ${i + 1}"><img src="${esc(g.image)}" alt="" loading="lazy"></button>`).join("")}</div>` : ""}
+              </section>` : ""}
+            ${models.length ? `
+              <section aria-label="3D models">
+                <div class="section-head" style="margin-bottom:12px"><div><span class="label">Interactive CAD</span><h2 style="font-size:1.9rem">3D model</h2></div></div>
+                ${models.length > 1 ? `<div class="model-tabs" id="model-tabs">${models.map((m, i) =>
+                  `<button type="button" class="chip" data-i="${i}" aria-pressed="${i === 0}">${esc(m.label || "Model " + (i + 1))}</button>`).join("")}</div>` : ""}
+                <div id="viewer-slot"></div>
+                <p class="muted" id="model-note" style="font-size:.9rem;margin-top:8px"></p>
+              </section>` : ""}
+            <article class="prose">${marked.parse(p.body || "")}</article>
+          </div>
+          <aside class="side">
+            ${(p.specs || []).length ? `
+              <div><span class="label">Specifications</span>
+                <table class="specs" style="margin-top:8px"><tbody>
+                  ${p.specs.map((s) => `<tr><th scope="row">${esc(s.label)}</th><td>${esc(s.value)}</td></tr>`).join("")}
+                </tbody></table></div>` : ""}
+            ${(p.tags || []).length ? `<div><span class="label">Tags</span><div class="tags" style="margin-top:10px">${p.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div></div>` : ""}
+            ${(p.links || []).length ? `<div class="links">${p.links.map((l) => `<a class="btn small" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>`).join("")}</div>` : ""}
+            ${p.shop_item ? `<a class="btn primary" href="/shop.html#${encodeURIComponent(p.shop_item)}">Order this print</a>` : ""}
+          </aside>
+        </div>`;
+
+      // Gallery
+      if (images.length) {
+        const img = document.getElementById("g-img"), cap = document.getElementById("g-cap");
+        const show = (i) => {
+          img.src = images[i].image; img.alt = images[i].caption || p.title;
+          cap.textContent = images[i].caption || ""; cap.hidden = !images[i].caption;
+          document.querySelectorAll("#thumbs button").forEach((b) => b.setAttribute("aria-current", b.dataset.i == i));
+        };
+        document.getElementById("thumbs")?.addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) show(+b.dataset.i); });
+        show(0);
+      }
+
+      // 3D models
+      if (models.length) {
+        const slot = document.getElementById("viewer-slot");
+        const note = document.getElementById("model-note");
+        const load = (i) => {
+          const m = models[i];
+          const el = document.createElement("div");
+          slot.replaceChildren(el);
+          mountViewer(el, { src: m.file, units: m.units, up: m.up, color: m.color });
+          note.textContent = m.note || "";
+        };
+        document.getElementById("model-tabs")?.addEventListener("click", (e) => {
+          const b = e.target.closest(".chip"); if (!b) return;
+          document.querySelectorAll("#model-tabs .chip").forEach((x) => x.setAttribute("aria-pressed", x === b));
+          load(+b.dataset.i);
+        });
+        load(0);
+      }
+    }
+  </script>
+</body>
+</html>
